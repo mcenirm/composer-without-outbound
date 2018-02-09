@@ -3,10 +3,20 @@
 
 BOX = "bento/centos-7.4"
 
+Machine = Struct.new(:name, :ipv4)
+
+MACHINES = [
+  Machine.new("web", "10.0.0.10"),
+  Machine.new("worker", "10.0.0.20"),
+]
+
 Vagrant.configure("2") do |config|
-  [:web, :worker].each do |name|
+  MACHINES.each do |machine|
+    name = machine[:name]
     config.vm.define name do |subconfig|
       subconfig.vm.box = BOX
+      subconfig.vm.hostname = name + ".qq"
+      subconfig.vm.network :private_network, ip: machine[:ipv4]
     end
   end
 end
