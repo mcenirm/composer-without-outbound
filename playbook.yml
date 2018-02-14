@@ -28,6 +28,18 @@
           {{ hostvars | to_nice_json }}
         dest: "/tmp/ansible.hostvars.json"
 
+- name: "Let worker find web by name"
+  hosts: "worker"
+  tasks:
+    - name: "Add web to /etc/hosts"
+      blockinfile:
+        path: "/etc/hosts"
+        insertafter: EOF
+        marker: "# {mark} Let worker find web by name"
+        create: no
+        state: present
+        block: "10.0.0.10  web.qq web"
+
 - name: "Prepare to block outbound traffic on web"
   hosts: "web"
   tasks:
@@ -49,23 +61,6 @@
       service:
         name: "firewalld"
         state: "stopped"
-
-- name: "Configure mdns"
-  hosts: "all"
-  tasks:
-    - name: "Install mdns packages"
-      package:
-        name: "{{ item }}"
-        state: "present"
-      with_items:
-        - "avahi"
-        - "avahi-tools"
-        - "nss-mdns"
-    - name: "Start avahi daemon"
-      service:
-        name: "avahi-daemon"
-        enabled: "yes"
-        state: "started"
 
 - name: "Add PHP"
   hosts: "all"
