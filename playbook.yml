@@ -6,6 +6,28 @@
     action: template src=templates/dumpall.j2 dest=/tmp/ansible.all
     # https://coderwall.com/p/13lh6w/dump-all-variables
 
+- name: "Prepare to block outbound traffic on web"
+  hosts: "web"
+  tasks:
+    - name: "Configure direct rules"
+      copy:
+        content: |
+          <?xml version="1.0" encoding="utf-8"?>
+          <direct>
+            <rule priority="0" table="filter" ipv="ipv4" chain="OUTPUT">-p tcp -m tcp --dport=80 -j REJECT</rule>
+            <rule priority="1" table="filter" ipv="ipv4" chain="OUTPUT">-p tcp -m tcp --dport=443 -j REJECT</rule>
+          </direct>
+        dest: "/etc/firewalld/direct.xml"
+        mode: "0644"
+
+- name: "Temporarily allow outbound traffic on web"
+  hosts: "web"
+  tasks:
+    - name: "Stop firewalld"
+      service:
+        name: "firewalld"
+        state: "stopped"
+
 - name: "Configure mdns"
   hosts: "all"
   tasks:
@@ -21,4 +43,12 @@
       service:
         name: "avahi-daemon"
         enabled: "yes"
+        state: "started"
+
+- name: "Block outbound traffic on web"
+  hosts: "web"
+  tasks:
+    - name: "Start firewalld"
+      service:
+        name: "firewalld"
         state: "started"
