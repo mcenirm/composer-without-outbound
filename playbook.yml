@@ -45,16 +45,8 @@
         enabled: "yes"
         state: "started"
 
-- name: "Block outbound traffic on web"
-  hosts: "web"
-  tasks:
-    - name: "Start firewalld"
-      service:
-        name: "firewalld"
-        state: "started"
-
 - name: "Add PHP"
-  hosts: "worker"
+  hosts: "all"
   tasks:
     - name: "Install SCL repo"
       package:
@@ -68,3 +60,11 @@
         state: "present"
       with_items:
         - "rh-php71-php-cli"
+
+- name: "Block outbound traffic on web"
+  hosts: "web"
+  tasks:
+    - name: "Start firewalld"
+      service:
+        name: "firewalld"
+        state: "started"
