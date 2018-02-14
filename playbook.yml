@@ -2,9 +2,31 @@
 - name: "Debug"
   hosts: "all"
   tasks:
-  - name: Dump all vars
-    action: template src=templates/dumpall.j2 dest=/tmp/ansible.all
-    # https://coderwall.com/p/13lh6w/dump-all-variables
+    - name: "Dump vars"
+      copy:
+        content: |
+          {{ vars | to_nice_json }}
+        dest: "/tmp/ansible.vars.json"
+    - name: "Dump environment"
+      copy:
+        content: |
+          {{ environment | to_nice_json }}
+        dest: "/tmp/ansible.environment.json"
+    - name: "Dump group_names"
+      copy:
+        content: |
+          {{ group_names | to_nice_json }}
+        dest: "/tmp/ansible.group_names.json"
+    - name: "Dump groups"
+      copy:
+        content: |
+          {{ groups | to_nice_json }}
+        dest: "/tmp/ansible.groups.json"
+    - name: "Dump hostvars"
+      copy:
+        content: |
+          {{ hostvars | to_nice_json }}
+        dest: "/tmp/ansible.hostvars.json"
 
 - name: "Prepare to block outbound traffic on web"
   hosts: "web"
