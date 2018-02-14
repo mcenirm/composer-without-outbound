@@ -61,6 +61,23 @@
       with_items:
         - "rh-php71-php-cli"
 
+- name: "Add composer"
+  hosts: "all"
+  tasks:
+    - name: "Download composer phar"
+      get_url:
+        url: "https://github.com/composer/composer/releases/download/1.6.3/composer.phar"
+        checksum: "sha256:52cb7bbbaee720471e3b34c8ae6db53a38f0b759c06078a80080db739e4dcab6"
+        dest: "/usr/local/bin/composer"
+        mode: "0755"
+    - name: "Create composer wrapper for SCL PHP"
+      copy:
+        content: |
+          #!/usr/bin/bash
+          scl enable rh-php71 -- /usr/local/bin/composer.phar "$@"
+        dest: "/usr/local/bin/composer"
+        mode: "0755"
+
 - name: "Block outbound traffic on web"
   hosts: "web"
   tasks:
