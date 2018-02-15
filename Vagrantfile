@@ -22,6 +22,8 @@ Vagrant.configure("2") do |config|
         ansible.become = true
         ansible.playbook = "playbook.yml"
       end
+      subconfig.ssh.forward_agent = true
+      config.ssh.insert_key = false
     end
   end
 end
