@@ -36,8 +36,11 @@
         content: |
           <?xml version="1.0" encoding="utf-8"?>
           <direct>
-            <rule priority="0" table="filter" ipv="ipv4" chain="OUTPUT">-p tcp -m tcp --dport=80 -j REJECT</rule>
-            <rule priority="1" table="filter" ipv="ipv4" chain="OUTPUT">-p tcp -m tcp --dport=443 -j REJECT</rule>
+            <rule priority="0" table="filter" ipv="ipv4" chain="OUTPUT">-m state --state INVALID -j DROP</rule>
+            <rule priority="1" table="filter" ipv="ipv4" chain="OUTPUT">-m state --state RELATED,ESTABLISHED -j ACCEPT</rule>
+            <rule priority="2" table="filter" ipv="ipv4" chain="OUTPUT">-d {{ ansible_default_ipv4.gateway }} -j ACCEPT</rule>
+            <rule priority="3" table="filter" ipv="ipv4" chain="OUTPUT">-d {{ ansible_dns.nameservers[0] }} -j ACCEPT</rule>
+            <rule priority="4" table="filter" ipv="ipv4" chain="OUTPUT">-j REJECT</rule>
           </direct>
         dest: "/etc/firewalld/direct.xml"
         mode: "0644"
