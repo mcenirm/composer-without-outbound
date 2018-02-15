@@ -28,20 +28,8 @@
           {{ hostvars | to_nice_json }}
         dest: "/tmp/ansible.hostvars.json"
 
-- name: "Let worker find web by name"
-  hosts: "worker"
-  tasks:
-    - name: "Add web to /etc/hosts"
-      blockinfile:
-        path: "/etc/hosts"
-        insertafter: EOF
-        marker: "# {mark} Let worker find web by name"
-        create: no
-        state: present
-        block: "10.0.0.10  web.qq web"
-
-- name: "Prepare to block outbound traffic on web"
-  hosts: "web"
+- name: "Prepare to block outbound traffic"
+  hosts: "all"
   tasks:
     - name: "Configure direct rules"
       copy:
@@ -54,8 +42,8 @@
         dest: "/etc/firewalld/direct.xml"
         mode: "0644"
 
-- name: "Temporarily allow outbound traffic on web"
-  hosts: "web"
+- name: "Temporarily allow outbound traffic"
+  hosts: "all"
   tasks:
     - name: "Stop firewalld"
       service:
@@ -95,8 +83,8 @@
         dest: "/usr/local/bin/composer"
         mode: "0755"
 
-- name: "Block outbound traffic on web"
-  hosts: "web"
+- name: "Block outbound traffic"
+  hosts: "all"
   tasks:
     - name: "Start firewalld"
       service:
